@@ -129,23 +129,6 @@ body {
   border-color: #0031d8;
 }
 
-.repo-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.repo-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #f0f0f3;
-  border: 1px solid #e8e8eb;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 12px;
-}
-
 .repo-tag-name {
   font-weight: 600;
   color: #1a1a1a;
@@ -157,18 +140,70 @@ body {
   font-size: 11px;
 }
 
-.repo-tag-delete {
-  background: none;
-  border: none;
-  color: #626264;
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-  padding: 0 2px;
+/* Repository Management */
+.repo-manage {
+  margin-top: 8px;
+  background: #ffffff;
+  border: 1px solid #e8e8eb;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.repo-tag-delete:hover {
+.repo-manage-header {
+  padding: 10px 16px;
+  background: #f8f8fb;
+  border-bottom: 1px solid #e8e8eb;
+}
+
+.repo-manage-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #626264;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.repo-manage-empty {
+  padding: 16px;
+  font-size: 13px;
+  color: #626264;
+}
+
+.repo-manage-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f0f0f3;
+}
+
+.repo-manage-row:last-child {
+  border-bottom: none;
+}
+
+.repo-manage-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.repo-manage-delete {
+  background: none;
+  border: 1px solid #d32f2f;
+  border-radius: 4px;
   color: #d32f2f;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.repo-manage-delete:hover {
+  background: #d32f2f;
+  color: #ffffff;
 }
 
 /* Section */
