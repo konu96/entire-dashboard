@@ -8,6 +8,6 @@ frontend/node_modules/
 frontend/dist/
 
 # IDE / tool settings
-.claude/
+.claude/settings.json
 .entire/
 .DS_Store
