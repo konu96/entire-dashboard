@@ -1,0 +1,23 @@
+frontend/src/App.tsx
+  79709fb679287adc 28,31-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "714332b18cf6227e22f586cfc92ff197df92568e",
+  "prompts": {
+    "79709fb679287adc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6822dafb-d15c-453d-8a6f-a61b69d7dd0b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 2,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
