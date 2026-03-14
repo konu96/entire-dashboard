@@ -60,7 +60,13 @@ func migrate(db *sql.DB) error {
 // Repository CRUD
 
 func (s *Store) AddRepo(path, name string) (models.Repository, error) {
-	_, err := s.db.Exec(
+	tx, err := s.db.Begin()
+	if err != nil {
+		return models.Repository{}, err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(
 		`INSERT INTO repositories (path, name) VALUES (?, ?) ON CONFLICT(path) DO UPDATE SET name=excluded.name`,
 		path, name,
 	)
@@ -69,10 +75,13 @@ func (s *Store) AddRepo(path, name string) (models.Repository, error) {
 	}
 
 	var repo models.Repository
-	err = s.db.QueryRow(
+	err = tx.QueryRow(
 		`SELECT id, path, name, created_at FROM repositories WHERE path = ?`, path,
 	).Scan(&repo.ID, &repo.Path, &repo.Name, &repo.CreatedAt)
 	if err != nil {
+		return models.Repository{}, err
+	}
+	if err := tx.Commit(); err != nil {
 		return models.Repository{}, err
 	}
 	return repo, nil
