@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"entire-dashboard/models"
 	"fmt"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -60,6 +61,9 @@ func migrate(db *sql.DB) error {
 // Repository CRUD
 
 func (s *Store) AddRepo(path, name string) (models.Repository, error) {
+	if strings.TrimSpace(path) == "" {
+		return models.Repository{}, fmt.Errorf("repo path is required")
+	}
 	tx, err := s.db.Begin()
 	if err != nil {
 		return models.Repository{}, err
