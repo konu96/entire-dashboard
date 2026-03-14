@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "0143c559cb62",
+  "strategy": "manual-commit",
+  "branch": "feat/initial-dashboard-app",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".gitignore"
+  ],
+  "sessions": [
+    {
+      "metadata": "/01/43c559cb62/0/metadata.json",
+      "transcript": "/01/43c559cb62/0/full.jsonl",
+      "context": "/01/43c559cb62/0/context.md",
+      "content_hash": "/01/43c559cb62/0/content_hash.txt",
+      "prompt": "/01/43c559cb62/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 13,
+    "cache_creation_tokens": 24248,
+    "cache_read_tokens": 289496,
+    "output_tokens": 2368,
+    "api_call_count": 12
+  }
+}
