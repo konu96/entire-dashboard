@@ -1,0 +1,23 @@
+README.md
+  ab524577cbdf7335 2-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "cda1f48923425644d9adb69c737fce02afec28b5",
+  "prompts": {
+    "ab524577cbdf7335": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90a637c3-7728-48bc-9406-7cf1ce45f566",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 95,
+      "total_deletions": 0,
+      "accepted_lines": 95,
+      "overriden_lines": 0
+    }
+  }
+}
