@@ -1,0 +1,23 @@
+CLAUDE.md
+  ab524577cbdf7335 3,5,8,11,14,17,21,23,25,27,29,31-36,38-42,44,47-52,55,57-62,64,66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "0c30038d5f21408ffe129e92b3a244473ee4b088",
+  "prompts": {
+    "ab524577cbdf7335": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90a637c3-7728-48bc-9406-7cf1ce45f566",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 38,
+      "total_deletions": 38,
+      "accepted_lines": 38,
+      "overriden_lines": 0
+    }
+  }
+}
