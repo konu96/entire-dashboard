@@ -87,15 +87,23 @@ func (s *Store) GetRepos() ([]models.Repository, error) {
 }
 
 func (s *Store) DeleteRepo(id int) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
 	var path string
-	if err := s.db.QueryRow(`SELECT path FROM repositories WHERE id = ?`, id).Scan(&path); err != nil {
+	if err := tx.QueryRow(`SELECT path FROM repositories WHERE id = ?`, id).Scan(&path); err != nil {
 		return err
 	}
-	if _, err := s.db.Exec(`DELETE FROM sessions WHERE repo_path = ?`, path); err != nil {
+	if _, err := tx.Exec(`DELETE FROM sessions WHERE repo_path = ?`, path); err != nil {
 		return err
 	}
-	_, err := s.db.Exec(`DELETE FROM repositories WHERE id = ?`, id)
-	return err
+	if _, err := tx.Exec(`DELETE FROM repositories WHERE id = ?`, id); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 // Session CRUD

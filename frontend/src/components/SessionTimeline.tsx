@@ -83,10 +83,10 @@ function SessionRow({ session: s }: { session: Session }) {
             lineHeight: 1.6,
             color: "#1a1a1a",
             whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
+            overflowWrap: "break-word",
             borderTop: "1px solid #e8e8eb",
             maxHeight: 300,
-            overflowY: "scroll",
+            overflowY: "auto",
           }}
         >
           {s.prompt}

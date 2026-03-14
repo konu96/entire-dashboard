@@ -12,7 +12,8 @@ go build -buildvcs=false -o entire-dashboard .
 
 echo "==> Building frontend..."
 cd "$SCRIPT_DIR/frontend"
-npm run build --silent 2>/dev/null
+npm install --silent
+npm run build
 
 echo "==> Starting Entire Dashboard on http://localhost:$PORT"
 cd "$SCRIPT_DIR/backend"

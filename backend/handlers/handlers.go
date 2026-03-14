@@ -122,6 +122,10 @@ func (h *Handler) Sync(w http.ResponseWriter, r *http.Request) {
 		inserted := 0
 		for _, sess := range sessions {
 			sess.RepoPath = rp
+			if sess.SessionID == "" {
+				log.Printf("skip session with empty session_id in %s", rp)
+				continue
+			}
 			exists, err := h.store.SessionExists(sess.SessionID)
 			if err != nil {
 				log.Printf("check exists error: %v", err)

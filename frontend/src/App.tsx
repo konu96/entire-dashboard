@@ -22,6 +22,7 @@ function App() {
   const [newRepoPath, setNewRepoPath] = useState("");
   const [addingRepo, setAddingRepo] = useState(false);
   const [showRepoForm, setShowRepoForm] = useState(false);
+  const [loadError, setLoadError] = useState<string>("");
 
   const loadRepos = useCallback(async () => {
     const r = await fetchRepos();
@@ -29,13 +30,20 @@ function App() {
   }, []);
 
   const loadData = useCallback(async () => {
-    const repoFilter = selectedRepo || undefined;
-    const [stats, sess] = await Promise.all([
-      fetchDailyStats(repoFilter),
-      fetchSessions(repoFilter),
-    ]);
-    setDailyStats(stats);
-    setSessions(sess);
+    try {
+      setLoadError("");
+      const repoFilter = selectedRepo || undefined;
+      const [stats, sess] = await Promise.all([
+        fetchDailyStats(repoFilter),
+        fetchSessions(repoFilter),
+      ]);
+      setDailyStats(stats);
+      setSessions(sess);
+    } catch (e) {
+      setDailyStats([]);
+      setSessions([]);
+      setLoadError(e instanceof Error ? e.message : "データ取得に失敗しました");
+    }
   }, [selectedRepo]);
 
   useEffect(() => {
@@ -61,7 +69,7 @@ function App() {
   };
 
   const handleAddRepo = async () => {
-    if (!newRepoPath.trim()) return;
+    if (addingRepo || !newRepoPath.trim()) return;
     setAddingRepo(true);
     try {
       await addRepo(newRepoPath.trim());
@@ -77,9 +85,12 @@ function App() {
 
   const handleDeleteRepo = async (id: number) => {
     try {
+      const target = repos.find((r) => r.id === id);
       await deleteRepo(id);
       await loadRepos();
-      setSelectedRepo("");
+      if (target?.path === selectedRepo) {
+        setSelectedRepo("");
+      }
     } catch (e) {
       alert(`Failed to delete repo: ${e instanceof Error ? e.message : e}`);
     }
@@ -166,6 +177,7 @@ function App() {
                   className="repo-tag-delete"
                   onClick={() => handleDeleteRepo(r.id)}
                   title="Remove repository"
+                  aria-label={`${r.name} を削除`}
                 >
                   &times;
                 </button>
@@ -174,6 +186,12 @@ function App() {
           </div>
         )}
       </div>
+
+      {loadError && (
+        <div style={{ color: "#d32f2f", background: "#fdecea", padding: "12px 16px", borderRadius: 8, marginBottom: 16, fontSize: 13 }}>
+          {loadError}
+        </div>
+      )}
 
       {/* KPI: Overview indicators */}
       <div className="kpi-row">
