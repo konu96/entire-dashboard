@@ -1,0 +1,398 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Hiragino Kaku Gothic ProN", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #f8f8fb;
+  color: #1a1a1a;
+}
+
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sync-status {
+  font-size: 12px;
+  color: #626264;
+}
+
+.sync-button {
+  background: #0031d8;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sync-button:hover {
+  background: #0028b0;
+}
+
+.sync-button:disabled {
+  background: #c5d7fb;
+  cursor: not-allowed;
+}
+
+/* Repository Bar */
+.repo-bar {
+  margin-bottom: 24px;
+}
+
+.repo-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.repo-select {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e8e8eb;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.repo-select:focus {
+  outline: none;
+  border-color: #0031d8;
+}
+
+.repo-add-button {
+  background: none;
+  border: 1px dashed #c5c5c8;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #626264;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.repo-add-button:hover {
+  border-color: #0031d8;
+  color: #0031d8;
+}
+
+.repo-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.repo-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e8e8eb;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+}
+
+.repo-input:focus {
+  outline: none;
+  border-color: #0031d8;
+}
+
+.repo-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.repo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f0f3;
+  border: 1px solid #e8e8eb;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.repo-tag-name {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.repo-tag-path {
+  color: #626264;
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+  font-size: 11px;
+}
+
+.repo-tag-delete {
+  background: none;
+  border: none;
+  color: #626264;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.repo-tag-delete:hover {
+  color: #d32f2f;
+}
+
+/* Section */
+.section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.section-subtitle {
+  font-size: 12px;
+  color: #626264;
+  margin-bottom: 16px;
+}
+
+/* KPI Cards */
+.kpi-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid #e8e8eb;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.kpi-card--primary {
+  background: #0031d8;
+  border-color: #0031d8;
+  color: #ffffff;
+}
+
+.kpi-label {
+  font-size: 12px;
+  color: #626264;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.kpi-card--primary .kpi-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.kpi-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.1;
+}
+
+.kpi-card--primary .kpi-value {
+  color: #ffffff;
+  font-size: 48px;
+}
+
+.kpi-unit {
+  font-size: 14px;
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+/* Chart Container */
+.chart-container {
+  background: #ffffff;
+  border: 1px solid #e8e8eb;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+/* Session List */
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: #e8e8eb;
+  border: 1px solid #e8e8eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.session-row {
+  background: #ffffff;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 100px 1fr 100px 100px 100px 80px;
+  align-items: center;
+  gap: 16px;
+}
+
+.session-row--header {
+  background: #f8f8fb;
+  font-size: 11px;
+  font-weight: 600;
+  color: #626264;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 20px;
+}
+
+.session-date {
+  font-size: 13px;
+  color: #626264;
+}
+
+.session-date-main {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.session-branch {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+  font-size: 12px;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-prompt {
+  font-size: 12px;
+  color: #626264;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.session-lines {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.session-lines--ai {
+  color: #0031d8;
+}
+
+.session-lines--human {
+  color: #22a06b;
+}
+
+.session-lines--total {
+  color: #1a1a1a;
+}
+
+.session-ratio {
+  text-align: right;
+}
+
+.session-ratio-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: #22a06b;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.session-ratio-fill {
+  height: 100%;
+  background: #0031d8;
+  border-radius: 2px;
+}
+
+.session-ratio-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #626264;
+}
+
+/* Agent Badge */
+.agent-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0031d8;
+  background: #e8f1fe;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Footer / Meta */
+.meta-info {
+  font-size: 11px;
+  color: #626264;
+  margin-top: 8px;
+  display: flex;
+  gap: 16px;
+}
+
+/* Clickable session row */
+.session-row--clickable {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.session-row--clickable:hover {
+  background: #f8f8fb;
+}
+
+/* Expanded prompt */
+.session-expanded-prompt {
+  background: #f8f8fb;
+  padding: 12px 20px 12px 136px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-top: 1px solid #e8e8eb;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #626264;
+  font-size: 14px;
+}
