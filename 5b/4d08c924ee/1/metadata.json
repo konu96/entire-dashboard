@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "5b4d08c924ee",
+  "session_id": "b1628d70-9147-4e75-b20f-36b1a0c422d9",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-14T08:44:20.35008Z",
+  "branch": "fix/repo-management",
+  "checkpoints_count": 6,
+  "files_touched": [
+    "backend/db/db.go",
+    "frontend/src/App.css",
+    "frontend/src/App.tsx"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "7badc830-f609-4704-81e0-0d4c20eff333",
+  "token_usage": {
+    "input_tokens": 86,
+    "cache_creation_tokens": 72912,
+    "cache_read_tokens": 3380976,
+    "output_tokens": 33458,
+    "api_call_count": 61
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-14T08:44:20.293934Z",
+    "agent_lines": 108,
+    "human_added": 45,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 153,
+    "agent_percentage": 70.58823529411765
+  }
+}
