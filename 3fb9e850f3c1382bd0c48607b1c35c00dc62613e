@@ -1,0 +1,27 @@
+backend/db/db.go
+  742588a6f3ef8afc 63-65,70-76,78
+frontend/src/App.tsx
+  742588a6f3ef8afc 25,81,85-93,102-104,165-169,194-201,203-207,209,212
+frontend/src/App.css
+  742588a6f3ef8afc 143-160,162-188,191-194,196-206
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "3fb9e850f3c1382bd0c48607b1c35c00dc62613e",
+  "prompts": {
+    "742588a6f3ef8afc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b1628d70-9147-4e75-b20f-36b1a0c422d9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 142,
+      "total_deletions": 72,
+      "accepted_lines": 118,
+      "overriden_lines": 0
+    }
+  }
+}
