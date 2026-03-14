@@ -1,0 +1,23 @@
+.gitignore
+  05c8e64783d0bf20 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "572997b06d54d0efbc75347ac815ece180f4bb88",
+  "prompts": {
+    "05c8e64783d0bf20": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cdb041f-c4ba-4e43-a0b1-e0eca611251b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 13,
+      "total_deletions": 0,
+      "accepted_lines": 13,
+      "overriden_lines": 0
+    }
+  }
+}
