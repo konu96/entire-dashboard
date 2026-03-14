@@ -25,8 +25,13 @@ function App() {
   const [loadError, setLoadError] = useState<string>("");
 
   const loadRepos = useCallback(async () => {
-    const r = await fetchRepos();
-    setRepos(r);
+    try {
+      const r = await fetchRepos();
+      setRepos(r);
+    } catch (e) {
+      setRepos([]);
+      setLoadError(e instanceof Error ? e.message : "リポジトリ取得に失敗しました");
+    }
   }, []);
 
   const loadData = useCallback(async () => {
