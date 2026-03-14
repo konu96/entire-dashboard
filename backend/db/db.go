@@ -60,12 +60,22 @@ func migrate(db *sql.DB) error {
 // Repository CRUD
 
 func (s *Store) AddRepo(path, name string) (models.Repository, error) {
-	res, err := s.db.Exec(`INSERT INTO repositories (path, name) VALUES (?, ?)`, path, name)
+	_, err := s.db.Exec(
+		`INSERT INTO repositories (path, name) VALUES (?, ?) ON CONFLICT(path) DO UPDATE SET name=excluded.name`,
+		path, name,
+	)
 	if err != nil {
 		return models.Repository{}, err
 	}
-	id, _ := res.LastInsertId()
-	return models.Repository{ID: int(id), Path: path, Name: name}, nil
+
+	var repo models.Repository
+	err = s.db.QueryRow(
+		`SELECT id, path, name, created_at FROM repositories WHERE path = ?`, path,
+	).Scan(&repo.ID, &repo.Path, &repo.Name, &repo.CreatedAt)
+	if err != nil {
+		return models.Repository{}, err
+	}
+	return repo, nil
 }
 
 func (s *Store) GetRepos() ([]models.Repository, error) {

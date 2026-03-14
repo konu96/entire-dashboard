@@ -22,6 +22,7 @@ function App() {
   const [newRepoPath, setNewRepoPath] = useState("");
   const [addingRepo, setAddingRepo] = useState(false);
   const [showRepoForm, setShowRepoForm] = useState(false);
+  const [showRepoManage, setShowRepoManage] = useState(false);
   const [loadError, setLoadError] = useState<string>("");
 
   const loadRepos = useCallback(async () => {
@@ -77,10 +78,19 @@ function App() {
     if (addingRepo || !newRepoPath.trim()) return;
     setAddingRepo(true);
     try {
-      await addRepo(newRepoPath.trim());
+      const repo = await addRepo(newRepoPath.trim());
       setNewRepoPath("");
       setShowRepoForm(false);
       await loadRepos();
+      setSelectedRepo(repo.path);
+      await syncData(repo.path);
+      setLastSynced(new Date().toLocaleString("ja-JP"));
+      const [stats, sess] = await Promise.all([
+        fetchDailyStats(repo.path),
+        fetchSessions(repo.path),
+      ]);
+      setDailyStats(stats);
+      setSessions(sess);
     } catch (e) {
       alert(`Failed to add repo: ${e instanceof Error ? e.message : e}`);
     } finally {
@@ -89,6 +99,9 @@ function App() {
   };
 
   const handleDeleteRepo = async (id: number) => {
+    if (!confirm("このリポジトリと関連するセッションデータを完全に削除しますか？")) {
+      return;
+    }
     try {
       const target = repos.find((r) => r.id === id);
       await deleteRepo(id);
@@ -149,6 +162,12 @@ function App() {
           >
             + Add
           </button>
+          <button
+            className="repo-add-button"
+            onClick={() => setShowRepoManage(!showRepoManage)}
+          >
+            Manage
+          </button>
         </div>
 
         {showRepoForm && (
@@ -172,19 +191,25 @@ function App() {
           </div>
         )}
 
-        {repos.length > 0 && (
-          <div className="repo-list">
+        {showRepoManage && (
+          <div className="repo-manage">
+            <div className="repo-manage-header">
+              <span className="repo-manage-title">リポジトリ管理</span>
+            </div>
+            {repos.length === 0 && (
+              <p className="repo-manage-empty">登録されたリポジトリはありません</p>
+            )}
             {repos.map((r) => (
-              <div key={r.id} className="repo-tag">
-                <span className="repo-tag-name">{r.name}</span>
-                <span className="repo-tag-path">{r.path}</span>
+              <div key={r.id} className="repo-manage-row">
+                <div className="repo-manage-info">
+                  <span className="repo-tag-name">{r.name}</span>
+                  <span className="repo-tag-path">{r.path}</span>
+                </div>
                 <button
-                  className="repo-tag-delete"
+                  className="repo-manage-delete"
                   onClick={() => handleDeleteRepo(r.id)}
-                  title="Remove repository"
-                  aria-label={`${r.name} を削除`}
                 >
-                  &times;
+                  削除
                 </button>
               </div>
             ))}
