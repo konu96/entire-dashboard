@@ -1,0 +1,23 @@
+backend/db/db.go
+  742588a6f3ef8afc 63-69,78,84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "d1122a5a805dfde949187747694dfa719e521ac6",
+  "prompts": {
+    "742588a6f3ef8afc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b1628d70-9147-4e75-b20f-36b1a0c422d9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 2,
+      "accepted_lines": 11,
+      "overriden_lines": 0
+    }
+  }
+}
