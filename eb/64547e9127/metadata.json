@@ -1,0 +1,34 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "eb64547e9127",
+  "strategy": "manual-commit",
+  "branch": "feat/initial-dashboard-app",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "backend/db/db.go",
+    "backend/handlers/handlers.go",
+    "backend/main.go",
+    "backend/models/models.go",
+    "frontend/src/App.css",
+    "frontend/src/App.tsx",
+    "frontend/src/api.ts",
+    "frontend/src/types.ts",
+    "start.sh"
+  ],
+  "sessions": [
+    {
+      "metadata": "/eb/64547e9127/0/metadata.json",
+      "transcript": "/eb/64547e9127/0/full.jsonl",
+      "context": "/eb/64547e9127/0/context.md",
+      "content_hash": "/eb/64547e9127/0/content_hash.txt",
+      "prompt": "/eb/64547e9127/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 4244,
+    "cache_creation_tokens": 44627,
+    "cache_read_tokens": 791505,
+    "output_tokens": 14894,
+    "api_call_count": 19
+  }
+}
