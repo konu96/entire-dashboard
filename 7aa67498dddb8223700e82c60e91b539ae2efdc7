@@ -1,0 +1,37 @@
+backend/git/reader.go
+  bf87cdac39cb4cfc 136-137,140
+backend/handlers/handlers.go
+  bf87cdac39cb4cfc 125-128
+start.sh
+  bf87cdac39cb4cfc 15-16
+frontend/src/api.ts
+  bf87cdac39cb4cfc 7-9,37-39,46-48,55-58
+backend/db/db.go
+  bf87cdac39cb4cfc 90-95,97,100,103,106
+frontend/src/App.css
+  bf87cdac39cb4cfc 388
+frontend/src/App.tsx
+  bf87cdac39cb4cfc 25,33-34,41-46,72,88,91,93,180,190-195
+frontend/src/components/SessionTimeline.tsx
+  bf87cdac39cb4cfc 86,89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "7aa67498dddb8223700e82c60e91b539ae2efdc7",
+  "prompts": {
+    "bf87cdac39cb4cfc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83e475ca-53e7-4ae2-be00-f7ede26087cb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 64,
+      "total_deletions": 19,
+      "accepted_lines": 57,
+      "overriden_lines": 0
+    }
+  }
+}
