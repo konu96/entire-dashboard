@@ -1,66 +1,66 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+このファイルは、Claude Code (claude.ai/code) がこのリポジトリで作業する際のガイダンスを提供します。
 
-## Build & Run
+## ビルド・起動
 
 ```bash
-# Production: build and start everything (default port 8080)
+# 本番: 全体をビルドして起動（デフォルトポート 8080）
 ./start.sh [REPO_PATH] [PORT]
 
-# Backend only
+# バックエンドのみ
 cd backend && go run main.go --port 8080
 
-# Frontend dev server (Vite, port 5173)
+# フロントエンド開発サーバー（Vite、ポート 5173）
 cd frontend && npm install && npm run dev
 
-# Frontend lint
+# フロントエンド lint
 cd frontend && npm run lint
 ```
 
-CLI flags for backend: `--repo <path>` (auto-register repo on startup), `--port <port>`.
+バックエンドの CLI フラグ: `--repo <path>`（起動時にリポジトリを自動登録）、`--port <port>`。
 
-No automated test suite exists yet.
+自動テストスイートはまだ存在しません。
 
-## Architecture
+## アーキテクチャ
 
-Full-stack app that visualizes AI agent session metrics from Entire CLI. Go backend serves a React SPA and a REST API backed by SQLite.
+Entire CLI の AI エージェントセッションメトリクスを可視化するフルスタックアプリ。Go バックエンドが React SPA と SQLite ベースの REST API を提供する。
 
-**Data flow:** User registers Git repos → "Sync" reads the `entire/checkpoints/v1` shadow branch via `git ls-tree`/`git show` → parses checkpoint JSON → upserts sessions into SQLite → frontend fetches stats via REST API → renders charts (Recharts) and tables.
+**データフロー:** ユーザーが Git リポジトリを登録 → 「Sync」で `entire/checkpoints/v1` shadow branch を `git ls-tree`/`git show` で読み取り → チェックポイント JSON をパース → SQLite にセッションを upsert → フロントエンドが REST API で統計を取得 → チャート（Recharts）とテーブルを描画。
 
-**Backend (Go 1.23, `backend/`):**
-- `main.go` — server setup, route registration, static file serving from `frontend/dist/`
-- `handlers/handlers.go` — all HTTP handlers on a `Handler` struct wrapping `*db.Store`
-- `db/db.go` — SQLite store with WAL mode, auto-migration, CRUD + aggregation queries
-- `models/models.go` — data structs (Repository, Session, DailyStat, CheckpointMeta)
-- `git/reader.go` — reads Entire checkpoint metadata from Git shadow branch
+**バックエンド (Go 1.23, `backend/`):**
+- `main.go` — サーバー設定、ルート登録、`frontend/dist/` からの静的ファイル配信
+- `handlers/handlers.go` — `*db.Store` をラップした `Handler` 構造体上の全 HTTP ハンドラ
+- `db/db.go` — WAL モードの SQLite ストア、自動マイグレーション、CRUD + 集計クエリ
+- `models/models.go` — データ構造体（Repository, Session, DailyStat, CheckpointMeta）
+- `git/reader.go` — Git shadow branch から Entire チェックポイントメタデータを読み取り
 
-**Frontend (React 19 + TypeScript + Vite, `frontend/`):**
-- `src/App.tsx` — main component, all state management via useState/useEffect
-- `src/api.ts` — API client with hardcoded `BASE = "http://localhost:8080"`
-- `src/components/DailyDashboard.tsx` — stacked bar chart (AI vs Human lines)
-- `src/components/SessionTimeline.tsx` — session detail table
+**フロントエンド (React 19 + TypeScript + Vite, `frontend/`):**
+- `src/App.tsx` — メインコンポーネント、useState/useEffect による状態管理
+- `src/api.ts` — `BASE = "http://localhost:8080"` がハードコードされた API クライアント
+- `src/components/DailyDashboard.tsx` — 積み上げ棒グラフ（AI vs ヒューマンの行数）
+- `src/components/SessionTimeline.tsx` — セッション詳細テーブル
 
-## API Routes
+## API ルート
 
 ```
-GET    /api/repos          — list repositories
-POST   /api/repos          — add repository (body: {path})
-DELETE /api/repos/{id}     — delete repository + associated sessions
-GET    /api/daily-stats    — daily aggregated stats (?repo=path filter)
-GET    /api/sessions       — session list (?repo=path filter)
-POST   /api/sync           — sync from Git (?repo=path filter)
+GET    /api/repos          — リポジトリ一覧
+POST   /api/repos          — リポジトリ追加（body: {path}）
+DELETE /api/repos/{id}     — リポジトリ削除（関連セッションも削除）
+GET    /api/daily-stats    — 日次集計統計（?repo=path でフィルタ可）
+GET    /api/sessions       — セッション一覧（?repo=path でフィルタ可）
+POST   /api/sync           — Git からデータ同期（?repo=path でフィルタ可）
 ```
 
-## Key Patterns
+## 主要パターン
 
-- **Handler methods** receive `(w http.ResponseWriter, r *http.Request)`, use `r.PathValue()` for path params and `r.URL.Query().Get()` for query params
-- **Database** uses `INSERT ... ON CONFLICT DO UPDATE` for idempotent session upserts
-- **CORS middleware** allows all origins (development-oriented)
-- **Frontend API calls** return `(await res.json()) ?? []` with null fallback
-- **TypeScript** strict mode enabled with `noUnusedLocals` and `noUnusedParameters`
-- **SQLite** stored at `~/.entire-dashboard/dashboard.db`, auto-created on first run
+- **ハンドラメソッド** は `(w http.ResponseWriter, r *http.Request)` を受け取り、パスパラメータに `r.PathValue()`、クエリパラメータに `r.URL.Query().Get()` を使用
+- **データベース** は `INSERT ... ON CONFLICT DO UPDATE` でセッションの冪等な upsert を実現
+- **CORS ミドルウェア** は全オリジンを許可（開発向け設定）
+- **フロントエンドの API 呼び出し** は `(await res.json()) ?? []` で null フォールバック
+- **TypeScript** は strict モード有効、`noUnusedLocals` と `noUnusedParameters` を設定
+- **SQLite** は `~/.entire-dashboard/dashboard.db` に保存、初回起動時に自動作成
 
-## Styling
+## スタイリング
 
-Pure CSS (no framework). System fonts with Japanese fallback (Hiragino Kaku Gothic ProN). Monospace fonts (SF Mono, Fira Code) for code-like content. Color palette: blues (#0031D8), greens (#22A06B), grays.
+素の CSS（フレームワークなし）。日本語フォールバック付きシステムフォント（Hiragino Kaku Gothic ProN）。コード表示用に等幅フォント（SF Mono, Fira Code）。カラーパレット: 青系 (#0031D8)、緑系 (#22A06B)、グレー系。
