@@ -1,0 +1,13 @@
+# Binaries
+backend/entire-dashboard
+
+# Dependencies
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+
+# IDE / tool settings
+.claude/
+.entire/
+.DS_Store
