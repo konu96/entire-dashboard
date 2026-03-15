@@ -11,3 +11,5 @@ frontend/dist/
 .claude/settings.json
 .entire/
 .DS_Store
+
+.idea/
