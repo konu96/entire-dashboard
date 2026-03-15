@@ -1,0 +1,30 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "ffdb6610c602",
+  "session_id": "c05c90d2-45ef-4796-aa82-f8d0305268d7",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-15T11:25:26.126469Z",
+  "branch": "feat/openapi-codegen",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "Makefile"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "8861b8c0-6476-4acd-b7a2-24e80f1bf411",
+  "token_usage": {
+    "input_tokens": 29,
+    "cache_creation_tokens": 58811,
+    "cache_read_tokens": 527430,
+    "output_tokens": 3359,
+    "api_call_count": 18
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-15T11:25:26.101871Z",
+    "agent_lines": 9,
+    "human_added": 8694,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 8703,
+    "agent_percentage": 0.1034126163391934
+  }
+}

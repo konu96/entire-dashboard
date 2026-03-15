@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "ffdb6610c602",
+  "strategy": "manual-commit",
+  "branch": "feat/openapi-codegen",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "Makefile"
+  ],
+  "sessions": [
+    {
+      "metadata": "/ff/db6610c602/0/metadata.json",
+      "transcript": "/ff/db6610c602/0/full.jsonl",
+      "context": "/ff/db6610c602/0/context.md",
+      "content_hash": "/ff/db6610c602/0/content_hash.txt",
+      "prompt": "/ff/db6610c602/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 29,
+    "cache_creation_tokens": 58811,
+    "cache_read_tokens": 527430,
+    "output_tokens": 3359,
+    "api_call_count": 18
+  }
+}
