@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Session } from "../types";
+import type { Session } from "../api/generated";
 
 interface Props {
   sessions: Session[];

@@ -2,14 +2,14 @@ import { useEffect, useState, useCallback } from "react";
 import { DailyDashboard } from "./components/DailyDashboard";
 import { SessionTimeline } from "./components/SessionTimeline";
 import {
-  fetchDailyStats,
-  fetchSessions,
-  fetchRepos,
-  addRepo,
-  deleteRepo,
+  getDailyStats,
+  getSessions,
+  getRepos,
+  addRepo as addRepoApi,
+  deleteRepo as deleteRepoApi,
   syncData,
-} from "./api";
-import type { DailyStat, Repository, Session } from "./types";
+} from "./api/generated";
+import type { DailyStat, Repository, Session } from "./api/generated";
 import "./App.css";
 
 function App() {
@@ -27,8 +27,13 @@ function App() {
 
   const loadRepos = useCallback(async () => {
     try {
-      const r = await fetchRepos();
-      setRepos(r);
+      const res = await getRepos();
+      if (res.status === 200) {
+        setRepos(res.data);
+      } else {
+        setRepos([]);
+        setLoadError(res.data.message);
+      }
     } catch (e) {
       setRepos([]);
       setLoadError(e instanceof Error ? e.message : "リポジトリ取得に失敗しました");
@@ -39,12 +44,12 @@ function App() {
     try {
       setLoadError("");
       const repoFilter = selectedRepo || undefined;
-      const [stats, sess] = await Promise.all([
-        fetchDailyStats(repoFilter),
-        fetchSessions(repoFilter),
+      const [statsRes, sessRes] = await Promise.all([
+        getDailyStats(repoFilter ? { repo: repoFilter } : undefined),
+        getSessions(repoFilter ? { repo: repoFilter } : undefined),
       ]);
-      setDailyStats(stats);
-      setSessions(sess);
+      setDailyStats(statsRes.status === 200 ? statsRes.data : []);
+      setSessions(sessRes.status === 200 ? sessRes.data : []);
     } catch (e) {
       setDailyStats([]);
       setSessions([]);
@@ -64,7 +69,7 @@ function App() {
     setSyncing(true);
     try {
       const repoFilter = selectedRepo || undefined;
-      await syncData(repoFilter);
+      await syncData(repoFilter ? { repo: repoFilter } : undefined);
       setLastSynced(new Date().toLocaleString("ja-JP"));
       await loadData();
     } catch {
@@ -78,19 +83,23 @@ function App() {
     if (addingRepo || !newRepoPath.trim()) return;
     setAddingRepo(true);
     try {
-      const repo = await addRepo(newRepoPath.trim());
+      const res = await addRepoApi({ path: newRepoPath.trim() });
+      if (res.status !== 200) {
+        throw new Error("data" in res ? (res.data as { message: string }).message : "Failed to add repo");
+      }
+      const repo = res.data;
       setNewRepoPath("");
       setShowRepoForm(false);
       await loadRepos();
       setSelectedRepo(repo.path);
-      await syncData(repo.path);
+      await syncData({ repo: repo.path });
       setLastSynced(new Date().toLocaleString("ja-JP"));
-      const [stats, sess] = await Promise.all([
-        fetchDailyStats(repo.path),
-        fetchSessions(repo.path),
+      const [statsRes, sessRes] = await Promise.all([
+        getDailyStats({ repo: repo.path }),
+        getSessions({ repo: repo.path }),
       ]);
-      setDailyStats(stats);
-      setSessions(sess);
+      setDailyStats(statsRes.status === 200 ? statsRes.data : []);
+      setSessions(sessRes.status === 200 ? sessRes.data : []);
     } catch (e) {
       alert(`Failed to add repo: ${e instanceof Error ? e.message : e}`);
     } finally {
@@ -104,7 +113,7 @@ function App() {
     }
     try {
       const target = repos.find((r) => r.id === id);
-      await deleteRepo(id);
+      await deleteRepoApi(id);
       await loadRepos();
       if (target?.path === selectedRepo) {
         setSelectedRepo("");

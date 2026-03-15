@@ -1,0 +1,272 @@
+openapi: "3.1.0"
+info:
+  title: Entire Dashboard API
+  description: AI agent session metrics visualization API
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/repos:
+    get:
+      operationId: getRepos
+      summary: List registered repositories
+      responses:
+        "200":
+          description: List of repositories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Repository"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    post:
+      operationId: addRepo
+      summary: Register a new repository
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddRepoRequest"
+      responses:
+        "200":
+          description: Created repository
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Repository"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/repos/{id}:
+    delete:
+      operationId: deleteRepo
+      summary: Delete a repository and its sessions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deletion result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteRepoResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/daily-stats:
+    get:
+      operationId: getDailyStats
+      summary: Get aggregated daily statistics
+      parameters:
+        - name: repo
+          in: query
+          required: false
+          description: Filter by repository path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of daily statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DailyStat"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/sessions:
+    get:
+      operationId: getSessions
+      summary: List sessions
+      parameters:
+        - name: repo
+          in: query
+          required: false
+          description: Filter by repository path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/sync:
+    post:
+      operationId: syncData
+      summary: Sync data from git shadow branch
+      parameters:
+        - name: repo
+          in: query
+          required: false
+          description: Sync specific repository only
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncResponse"
+        "500":
+          $ref: "#/components/responses/InternalError"
+components:
+  schemas:
+    Repository:
+      type: object
+      required:
+        - id
+        - path
+        - name
+        - created_at
+      properties:
+        id:
+          type: integer
+        path:
+          type: string
+        name:
+          type: string
+        created_at:
+          type: string
+    AddRepoRequest:
+      type: object
+      required:
+        - path
+      properties:
+        path:
+          type: string
+    DeleteRepoResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+    DailyStat:
+      type: object
+      required:
+        - date
+        - agent_lines
+        - human_lines
+        - total_lines
+        - agent_percentage
+        - session_count
+      properties:
+        date:
+          type: string
+        agent_lines:
+          type: integer
+        human_lines:
+          type: integer
+        total_lines:
+          type: integer
+        agent_percentage:
+          type: number
+          format: double
+        session_count:
+          type: integer
+    Session:
+      type: object
+      required:
+        - id
+        - repo_path
+        - checkpoint_id
+        - session_id
+        - agent
+        - branch
+        - created_at
+        - prompt
+        - agent_lines
+        - human_added
+        - human_modified
+        - human_removed
+        - total_committed
+        - agent_percentage
+        - input_tokens
+        - output_tokens
+        - api_call_count
+      properties:
+        id:
+          type: integer
+        repo_path:
+          type: string
+        checkpoint_id:
+          type: string
+        session_id:
+          type: string
+        agent:
+          type: string
+        branch:
+          type: string
+        created_at:
+          type: string
+        prompt:
+          type: string
+        agent_lines:
+          type: integer
+        human_added:
+          type: integer
+        human_modified:
+          type: integer
+        human_removed:
+          type: integer
+        total_committed:
+          type: integer
+        agent_percentage:
+          type: number
+          format: double
+        input_tokens:
+          type: integer
+        output_tokens:
+          type: integer
+        api_call_count:
+          type: integer
+    SyncResponse:
+      type: object
+      required:
+        - total_found
+        - inserted
+        - message
+      properties:
+        total_found:
+          type: integer
+        inserted:
+          type: integer
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"

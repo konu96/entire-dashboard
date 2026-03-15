@@ -1,98 +1,124 @@
 package handlers
 
 import (
-	"encoding/json"
+	"context"
 	"entire-dashboard/db"
+	"entire-dashboard/generated"
 	gitreader "entire-dashboard/git"
 	"log"
-	"net/http"
 	"path/filepath"
-	"strconv"
 )
 
 type Handler struct {
 	store *db.Store
 }
 
+var _ generated.Handler = (*Handler)(nil)
+
 func New(store *db.Store) *Handler {
 	return &Handler{store: store}
 }
 
-func (h *Handler) GetRepos(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetRepos(ctx context.Context) (generated.GetReposRes, error) {
 	repos, err := h.store.GetRepos()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return &generated.ErrorResponse{Message: err.Error()}, nil
 	}
-	writeJSON(w, repos)
+	result := make(generated.GetReposOKApplicationJSON, 0, len(repos))
+	for _, r := range repos {
+		result = append(result, generated.Repository{
+			ID:        r.ID,
+			Path:      r.Path,
+			Name:      r.Name,
+			CreatedAt: r.CreatedAt,
+		})
+	}
+	return &result, nil
 }
 
-func (h *Handler) AddRepo(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Path string `json:"path"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
-		return
-	}
+func (h *Handler) AddRepo(ctx context.Context, req *generated.AddRepoRequest) (generated.AddRepoRes, error) {
 	if req.Path == "" {
-		http.Error(w, "path is required", http.StatusBadRequest)
-		return
+		return &generated.AddRepoBadRequest{Message: "path is required"}, nil
 	}
 
 	absPath, err := filepath.Abs(req.Path)
 	if err != nil {
-		http.Error(w, "invalid path: "+err.Error(), http.StatusBadRequest)
-		return
+		return &generated.AddRepoBadRequest{Message: "invalid path: " + err.Error()}, nil
 	}
 
 	name := filepath.Base(absPath)
 	repo, err := h.store.AddRepo(absPath, name)
 	if err != nil {
-		http.Error(w, "failed to add repo: "+err.Error(), http.StatusInternalServerError)
-		return
+		return &generated.AddRepoInternalServerError{Message: "failed to add repo: " + err.Error()}, nil
 	}
-	writeJSON(w, repo)
+	return &generated.Repository{
+		ID:        repo.ID,
+		Path:      repo.Path,
+		Name:      repo.Name,
+		CreatedAt: repo.CreatedAt,
+	}, nil
 }
 
-func (h *Handler) DeleteRepo(w http.ResponseWriter, r *http.Request) {
-	idStr := r.PathValue("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
-		return
+func (h *Handler) DeleteRepo(ctx context.Context, params generated.DeleteRepoParams) (generated.DeleteRepoRes, error) {
+	if err := h.store.DeleteRepo(params.ID); err != nil {
+		return &generated.DeleteRepoInternalServerError{Message: "failed to delete repo: " + err.Error()}, nil
 	}
-	if err := h.store.DeleteRepo(id); err != nil {
-		http.Error(w, "failed to delete repo: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	writeJSON(w, map[string]string{"status": "ok"})
+	return &generated.DeleteRepoResponse{Status: "ok"}, nil
 }
 
-func (h *Handler) GetDailyStats(w http.ResponseWriter, r *http.Request) {
-	repoPath := r.URL.Query().Get("repo")
+func (h *Handler) GetDailyStats(ctx context.Context, params generated.GetDailyStatsParams) (generated.GetDailyStatsRes, error) {
+	repoPath := params.Repo.Or("")
 	stats, err := h.store.GetDailyStats(repoPath)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return &generated.ErrorResponse{Message: err.Error()}, nil
 	}
-	writeJSON(w, stats)
+	result := make(generated.GetDailyStatsOKApplicationJSON, 0, len(stats))
+	for _, s := range stats {
+		result = append(result, generated.DailyStat{
+			Date:            s.Date,
+			AgentLines:      s.AgentLines,
+			HumanLines:      s.HumanLines,
+			TotalLines:      s.TotalLines,
+			AgentPercentage: s.AgentPercentage,
+			SessionCount:    s.SessionCount,
+		})
+	}
+	return &result, nil
 }
 
-func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
-	repoPath := r.URL.Query().Get("repo")
+func (h *Handler) GetSessions(ctx context.Context, params generated.GetSessionsParams) (generated.GetSessionsRes, error) {
+	repoPath := params.Repo.Or("")
 	sessions, err := h.store.GetSessions(repoPath)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return &generated.ErrorResponse{Message: err.Error()}, nil
 	}
-	writeJSON(w, sessions)
+	result := make(generated.GetSessionsOKApplicationJSON, 0, len(sessions))
+	for _, s := range sessions {
+		result = append(result, generated.Session{
+			ID:              s.ID,
+			RepoPath:        s.RepoPath,
+			CheckpointID:    s.CheckpointID,
+			SessionID:       s.SessionID,
+			Agent:           s.Agent,
+			Branch:          s.Branch,
+			CreatedAt:       s.CreatedAt,
+			Prompt:          s.Prompt,
+			AgentLines:      s.AgentLines,
+			HumanAdded:      s.HumanAdded,
+			HumanModified:   s.HumanModified,
+			HumanRemoved:    s.HumanRemoved,
+			TotalCommitted:  s.TotalCommitted,
+			AgentPercentage: s.AgentPercentage,
+			InputTokens:     s.InputTokens,
+			OutputTokens:    s.OutputTokens,
+			APICallCount:    s.APICallCount,
+		})
+	}
+	return &result, nil
 }
 
-// Sync reads from the git shadow branch and upserts into SQLite.
-// If ?repo= is specified, syncs that repo only. Otherwise syncs all registered repos.
-func (h *Handler) Sync(w http.ResponseWriter, r *http.Request) {
-	repoPath := r.URL.Query().Get("repo")
+func (h *Handler) SyncData(ctx context.Context, params generated.SyncDataParams) (generated.SyncDataRes, error) {
+	repoPath := params.Repo.Or("")
 
 	var repos []string
 	if repoPath != "" {
@@ -100,8 +126,7 @@ func (h *Handler) Sync(w http.ResponseWriter, r *http.Request) {
 	} else {
 		repoList, err := h.store.GetRepos()
 		if err != nil {
-			http.Error(w, "failed to list repos: "+err.Error(), http.StatusInternalServerError)
-			return
+			return &generated.ErrorResponse{Message: "failed to list repos: " + err.Error()}, nil
 		}
 		for _, r := range repoList {
 			repos = append(repos, r.Path)
@@ -144,14 +169,9 @@ func (h *Handler) Sync(w http.ResponseWriter, r *http.Request) {
 		totalInserted += inserted
 	}
 
-	writeJSON(w, map[string]any{
-		"total_found": totalFound,
-		"inserted":    totalInserted,
-		"message":     "sync complete",
-	})
-}
-
-func writeJSON(w http.ResponseWriter, v any) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(v)
+	return &generated.SyncResponse{
+		TotalFound: totalFound,
+		Inserted:   totalInserted,
+		Message:    "sync complete",
+	}, nil
 }
