@@ -1,0 +1,43 @@
+backend/handlers/handlers.go
+  5ff34676734a7c6f 4,6,16-17,22,25-34,36,39,41,46,52,54-59,62-64,66,69-70,73-84,86,89-90,93,95-115,117,120-121,129,172-176
+frontend/src/App.tsx
+  5ff34676734a7c6f 5-9,11-12,30-36,47-49,51-52,72,86-90,95,97-99,101-102,116
+frontend/orval.config.ts
+  5ff34676734a7c6f 1-15
+frontend/src/components/DailyDashboard.tsx
+  5ff34676734a7c6f 10
+frontend/package.json
+  5ff34676734a7c6f 10
+api/openapi.yml
+  5ff34676734a7c6f 1-272
+frontend/src/components/SessionTimeline.tsx
+  5ff34676734a7c6f 2
+backend/tools.go
+  5ff34676734a7c6f 1-5
+backend/main.go
+  5ff34676734a7c6f 5,51-54,56-57,60,64,68-79,82
+Makefile
+  5ff34676734a7c6f 1-9
+backend/generate.go
+  5ff34676734a7c6f 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "ffa6c2e35f0a87cb36949f74263380f89bcc8b5c",
+  "prompts": {
+    "5ff34676734a7c6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dead2886-0696-4268-9362-8095126f069c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 454,
+      "total_deletions": 111,
+      "accepted_lines": 441,
+      "overriden_lines": 0
+    }
+  }
+}
