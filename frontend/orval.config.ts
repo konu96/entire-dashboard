@@ -8,7 +8,7 @@ export default defineConfig({
     output: {
       target: "src/api/generated.ts",
       client: "fetch",
-      baseUrl: "http://localhost:8080",
+      baseUrl: "",
       mode: "single",
     },
   },

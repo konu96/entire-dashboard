@@ -117,7 +117,7 @@ export const getGetReposUrl = () => {
 
   
 
-  return `http://localhost:8080/api/repos`
+  return `/api/repos`
 }
 
 export const getRepos = async ( options?: RequestInit): Promise<getReposResponse> => {
@@ -171,7 +171,7 @@ export const getAddRepoUrl = () => {
 
   
 
-  return `http://localhost:8080/api/repos`
+  return `/api/repos`
 }
 
 export const addRepo = async (addRepoRequest: AddRepoRequest, options?: RequestInit): Promise<addRepoResponse> => {
@@ -226,7 +226,7 @@ export const getDeleteRepoUrl = (id: number,) => {
 
   
 
-  return `http://localhost:8080/api/repos/${id}`
+  return `/api/repos/${id}`
 }
 
 export const deleteRepo = async (id: number, options?: RequestInit): Promise<deleteRepoResponse> => {
@@ -282,7 +282,7 @@ export const getGetDailyStatsUrl = (params?: GetDailyStatsParams,) => {
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `http://localhost:8080/api/daily-stats?${stringifiedParams}` : `http://localhost:8080/api/daily-stats`
+  return stringifiedParams.length > 0 ? `/api/daily-stats?${stringifiedParams}` : `/api/daily-stats`
 }
 
 export const getDailyStats = async (params?: GetDailyStatsParams, options?: RequestInit): Promise<getDailyStatsResponse> => {
@@ -338,7 +338,7 @@ export const getGetSessionsUrl = (params?: GetSessionsParams,) => {
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `http://localhost:8080/api/sessions?${stringifiedParams}` : `http://localhost:8080/api/sessions`
+  return stringifiedParams.length > 0 ? `/api/sessions?${stringifiedParams}` : `/api/sessions`
 }
 
 export const getSessions = async (params?: GetSessionsParams, options?: RequestInit): Promise<getSessionsResponse> => {
@@ -394,7 +394,7 @@ export const getSyncDataUrl = (params?: SyncDataParams,) => {
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `http://localhost:8080/api/sync?${stringifiedParams}` : `http://localhost:8080/api/sync`
+  return stringifiedParams.length > 0 ? `/api/sync?${stringifiedParams}` : `/api/sync`
 }
 
 export const syncData = async (params?: SyncDataParams, options?: RequestInit): Promise<syncDataResponse> => {
