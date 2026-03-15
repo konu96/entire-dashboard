@@ -1,0 +1,25 @@
+api/openapi.yml
+  3e75f728dabca28a 7
+frontend/orval.config.ts
+  3e75f728dabca28a 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "be0187813a9a7cae82f99de5d6e4bcd06679e4a3",
+  "prompts": {
+    "3e75f728dabca28a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c2347b9e-f8d3-4e15-8ec7-89849d85a869",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 2,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
