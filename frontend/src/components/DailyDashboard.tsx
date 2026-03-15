@@ -7,7 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { DailyStat } from "../types";
+import type { DailyStat } from "../api/generated";
 
 interface Props {
   data: DailyStat[];

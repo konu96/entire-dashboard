@@ -2,6 +2,7 @@ package main
 
 import (
 	"entire-dashboard/db"
+	"entire-dashboard/generated"
 	"entire-dashboard/handlers"
 	"flag"
 	"log"
@@ -47,30 +48,38 @@ func main() {
 
 	h := handlers.New(store)
 
-	mux := http.NewServeMux()
+	ogenServer, err := generated.NewServer(h)
+	if err != nil {
+		log.Fatalf("create ogen server: %v", err)
+	}
 
-	// API routes
-	mux.HandleFunc("GET /api/repos", h.GetRepos)
-	mux.HandleFunc("POST /api/repos", h.AddRepo)
-	mux.HandleFunc("DELETE /api/repos/{id}", h.DeleteRepo)
-	mux.HandleFunc("GET /api/daily-stats", h.GetDailyStats)
-	mux.HandleFunc("GET /api/sessions", h.GetSessions)
-	mux.HandleFunc("POST /api/sync", h.Sync)
-
-	// Serve frontend static files
+	// Resolve frontend static file directory
+	var fileServer http.Handler
 	frontendDir := filepath.Join(filepath.Dir(os.Args[0]), "..", "frontend", "dist")
 	if _, err := os.Stat(frontendDir); err == nil {
-		mux.Handle("/", http.FileServer(http.Dir(frontendDir)))
+		fileServer = http.FileServer(http.Dir(frontendDir))
 	} else {
-		// Fallback: serve from relative path during development
 		devFrontend := filepath.Join(".", "..", "frontend", "dist")
 		if _, err := os.Stat(devFrontend); err == nil {
-			mux.Handle("/", http.FileServer(http.Dir(devFrontend)))
+			fileServer = http.FileServer(http.Dir(devFrontend))
 		}
 	}
 
+	// Route /api/* to ogen, everything else to static files
+	root := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if len(r.URL.Path) >= 4 && r.URL.Path[:4] == "/api" {
+			ogenServer.ServeHTTP(w, r)
+			return
+		}
+		if fileServer != nil {
+			fileServer.ServeHTTP(w, r)
+			return
+		}
+		http.NotFound(w, r)
+	})
+
 	// CORS middleware for development
-	handler := corsMiddleware(mux)
+	handler := corsMiddleware(root)
 
 	log.Printf("Starting server on :%s", *port)
 	log.Fatal(http.ListenAndServe(":"+*port, handler))
