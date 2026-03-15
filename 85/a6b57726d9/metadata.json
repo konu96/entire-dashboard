@@ -1,0 +1,57 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "85a6b57726d9",
+  "strategy": "manual-commit",
+  "branch": "feat/openapi-codegen",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "Makefile",
+    "api/openapi.yml",
+    "backend/generate.go",
+    "backend/generated/oas_cfg_gen.go",
+    "backend/generated/oas_client_gen.go",
+    "backend/generated/oas_handlers_gen.go",
+    "backend/generated/oas_interfaces_gen.go",
+    "backend/generated/oas_json_gen.go",
+    "backend/generated/oas_labeler_gen.go",
+    "backend/generated/oas_middleware_gen.go",
+    "backend/generated/oas_operations_gen.go",
+    "backend/generated/oas_parameters_gen.go",
+    "backend/generated/oas_request_decoders_gen.go",
+    "backend/generated/oas_request_encoders_gen.go",
+    "backend/generated/oas_response_decoders_gen.go",
+    "backend/generated/oas_response_encoders_gen.go",
+    "backend/generated/oas_router_gen.go",
+    "backend/generated/oas_schemas_gen.go",
+    "backend/generated/oas_server_gen.go",
+    "backend/generated/oas_unimplemented_gen.go",
+    "backend/generated/oas_validators_gen.go",
+    "backend/handlers/handlers.go",
+    "backend/main.go",
+    "backend/tools.go",
+    "frontend/orval.config.ts",
+    "frontend/package.json",
+    "frontend/src/App.tsx",
+    "frontend/src/api.ts",
+    "frontend/src/api/generated.ts",
+    "frontend/src/components/DailyDashboard.tsx",
+    "frontend/src/components/SessionTimeline.tsx",
+    "frontend/src/types.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/85/a6b57726d9/0/metadata.json",
+      "transcript": "/85/a6b57726d9/0/full.jsonl",
+      "context": "/85/a6b57726d9/0/context.md",
+      "content_hash": "/85/a6b57726d9/0/content_hash.txt",
+      "prompt": "/85/a6b57726d9/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 81,
+    "cache_creation_tokens": 95549,
+    "cache_read_tokens": 4552848,
+    "output_tokens": 20767,
+    "api_call_count": 67
+  }
+}
