@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "996f309f7f37",
+  "session_id": "c2347b9e-f8d3-4e15-8ec7-89849d85a869",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-15T13:14:55.99164Z",
+  "branch": "feat/openapi-codegen",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "api/openapi.yml",
+    "frontend/orval.config.ts"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "b28420d0-5ee1-4821-bdc9-a60d0d536062",
+  "token_usage": {
+    "input_tokens": 20,
+    "cache_creation_tokens": 74687,
+    "cache_read_tokens": 449794,
+    "output_tokens": 3209,
+    "api_call_count": 15
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-15T13:14:55.9692Z",
+    "agent_lines": 2,
+    "human_added": 10,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 12,
+    "agent_percentage": 16.666666666666664
+  }
+}
