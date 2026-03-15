@@ -1,0 +1,33 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "20bd0ab03cf4",
+  "session_id": "ecf032e3-fc8f-41db-b7d3-19fb4ec8ca39",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-15T13:53:24.652147Z",
+  "branch": "feat/sqlc",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/superpowers/plans/2026-03-15-sqlc-introduction.md",
+    "docs/superpowers/specs/2026-03-15-sqlc-introduction-design.md"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "2b9aecd2-4c86-499e-b325-bda733c3831e",
+  "checkpoint_transcript_start": 228,
+  "transcript_lines_at_start": 228,
+  "token_usage": {
+    "input_tokens": 24,
+    "cache_creation_tokens": 46594,
+    "cache_read_tokens": 1640301,
+    "output_tokens": 11957,
+    "api_call_count": 20
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-15T13:53:24.556119Z",
+    "agent_lines": 800,
+    "human_added": 10,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 810,
+    "agent_percentage": 98.76543209876543
+  }
+}
