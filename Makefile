@@ -6,4 +6,4 @@ generate-backend:
 	cd backend && go generate ./...
 
 generate-frontend:
-	cd frontend && npx orval
+	cd frontend && npm run generate
