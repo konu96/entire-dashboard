@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "399e904b2c7f",
+  "strategy": "manual-commit",
+  "branch": "feat/sqlc",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/superpowers/specs/2026-03-15-sqlc-introduction-design.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/39/9e904b2c7f/0/metadata.json",
+      "transcript": "/39/9e904b2c7f/0/full.jsonl",
+      "context": "/39/9e904b2c7f/0/context.md",
+      "content_hash": "/39/9e904b2c7f/0/content_hash.txt",
+      "prompt": "/39/9e904b2c7f/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 3299,
+    "cache_creation_tokens": 52835,
+    "cache_read_tokens": 1459642,
+    "output_tokens": 13157,
+    "api_call_count": 33
+  }
+}
