@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "bc7cedffffec0c183c309ca8d2d9cc2537404f68",
+  "prompts": {
+    "b06a1617ef5cefa7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ecf032e3-fc8f-41db-b7d3-19fb4ec8ca39",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 18,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
