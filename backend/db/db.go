@@ -1,229 +1,145 @@
 package db
 
 import (
+	"context"
 	"database/sql"
+	"embed"
+	"entire-dashboard/db/sqlc"
 	"entire-dashboard/models"
 	"fmt"
 	"strings"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/pressly/goose/v3"
+	_ "modernc.org/sqlite"
 )
 
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
+
 type Store struct {
-	db *sql.DB
+	db      *sql.DB
+	queries *sqlc.Queries
 }
 
 func New(path string) (*Store, error) {
-	db, err := sql.Open("sqlite3", path+"?_journal_mode=WAL")
+	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, fmt.Errorf("open db: %w", err)
 	}
-	if err := migrate(db); err != nil {
+	if _, err := db.Exec("PRAGMA journal_mode=WAL"); err != nil {
+		return nil, fmt.Errorf("set WAL mode: %w", err)
+	}
+
+	if err := runMigrations(db); err != nil {
 		return nil, fmt.Errorf("migrate: %w", err)
 	}
-	return &Store{db: db}, nil
+
+	return &Store{db: db, queries: sqlc.New(db)}, nil
 }
 
-func migrate(db *sql.DB) error {
-	_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS repositories (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			path TEXT NOT NULL UNIQUE,
-			name TEXT NOT NULL DEFAULT '',
-			created_at TEXT NOT NULL DEFAULT (datetime('now'))
-		);
-
-		CREATE TABLE IF NOT EXISTS sessions (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			repo_path TEXT NOT NULL DEFAULT '',
-			checkpoint_id TEXT NOT NULL,
-			session_id TEXT NOT NULL UNIQUE,
-			agent TEXT NOT NULL DEFAULT '',
-			branch TEXT NOT NULL DEFAULT '',
-			created_at TEXT NOT NULL DEFAULT '',
-			prompt TEXT NOT NULL DEFAULT '',
-			agent_lines INTEGER NOT NULL DEFAULT 0,
-			human_added INTEGER NOT NULL DEFAULT 0,
-			human_modified INTEGER NOT NULL DEFAULT 0,
-			human_removed INTEGER NOT NULL DEFAULT 0,
-			total_committed INTEGER NOT NULL DEFAULT 0,
-			agent_percentage REAL NOT NULL DEFAULT 0,
-			input_tokens INTEGER NOT NULL DEFAULT 0,
-			output_tokens INTEGER NOT NULL DEFAULT 0,
-			api_call_count INTEGER NOT NULL DEFAULT 0
-		);
-		CREATE INDEX IF NOT EXISTS idx_sessions_created_at ON sessions(created_at);
-		CREATE INDEX IF NOT EXISTS idx_sessions_repo_path ON sessions(repo_path);
-	`)
-	return err
-}
-
-// Repository CRUD
-
-func (s *Store) AddRepo(path, name string) (models.Repository, error) {
-	if strings.TrimSpace(path) == "" {
-		return models.Repository{}, fmt.Errorf("repo path is required")
-	}
-	tx, err := s.db.Begin()
-	if err != nil {
-		return models.Repository{}, err
-	}
-	defer tx.Rollback()
-
-	_, err = tx.Exec(
-		`INSERT INTO repositories (path, name) VALUES (?, ?) ON CONFLICT(path) DO UPDATE SET name=excluded.name`,
-		path, name,
-	)
-	if err != nil {
-		return models.Repository{}, err
+func runMigrations(db *sql.DB) error {
+	goose.SetBaseFS(embedMigrations)
+	if err := goose.SetDialect("sqlite3"); err != nil {
+		return fmt.Errorf("set dialect: %w", err)
 	}
 
-	var repo models.Repository
-	err = tx.QueryRow(
-		`SELECT id, path, name, created_at FROM repositories WHERE path = ?`, path,
-	).Scan(&repo.ID, &repo.Path, &repo.Name, &repo.CreatedAt)
-	if err != nil {
-		return models.Repository{}, err
-	}
-	if err := tx.Commit(); err != nil {
-		return models.Repository{}, err
-	}
-	return repo, nil
-}
-
-func (s *Store) GetRepos() ([]models.Repository, error) {
-	rows, err := s.db.Query(`SELECT id, path, name, created_at FROM repositories ORDER BY created_at`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var repos []models.Repository
-	for rows.Next() {
-		var r models.Repository
-		if err := rows.Scan(&r.ID, &r.Path, &r.Name, &r.CreatedAt); err != nil {
-			return nil, err
+	// 既存 DB との互換性: goose_db_version テーブルがなく、
+	// repositories テーブルが既に存在する場合は、
+	// マイグレーション 1 を適用済みとしてマークする
+	var gooseTableExists int
+	_ = db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='goose_db_version'").Scan(&gooseTableExists)
+	if gooseTableExists == 0 {
+		var repoTableExists int
+		_ = db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='repositories'").Scan(&repoTableExists)
+		if repoTableExists > 0 {
+			if err := goose.Up(db, "migrations"); err != nil {
+				// goose テーブルが初期化され、001_initial.sql は IF NOT EXISTS なので安全
+				return fmt.Errorf("initial goose up: %w", err)
+			}
+			return nil
 		}
-		repos = append(repos, r)
 	}
-	return repos, rows.Err()
+
+	return goose.Up(db, "migrations")
 }
 
-func (s *Store) DeleteRepo(id int) error {
+// Repository operations
+
+func (s *Store) AddRepo(path, name string) (sqlc.Repository, error) {
+	if strings.TrimSpace(path) == "" {
+		return sqlc.Repository{}, fmt.Errorf("repo path is required")
+	}
+	return s.queries.UpsertRepo(context.Background(), sqlc.UpsertRepoParams{
+		Path: path,
+		Name: name,
+	})
+}
+
+func (s *Store) GetRepos() ([]sqlc.Repository, error) {
+	return s.queries.GetRepos(context.Background())
+}
+
+func (s *Store) DeleteRepo(id int64) error {
+	ctx := context.Background()
 	tx, err := s.db.Begin()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
 
-	var path string
-	if err := tx.QueryRow(`SELECT path FROM repositories WHERE id = ?`, id).Scan(&path); err != nil {
+	qtx := s.queries.WithTx(tx)
+	path, err := qtx.GetRepoPath(ctx, id)
+	if err != nil {
 		return err
 	}
-	if _, err := tx.Exec(`DELETE FROM sessions WHERE repo_path = ?`, path); err != nil {
+	if err := qtx.DeleteSessionsByRepoPath(ctx, path); err != nil {
 		return err
 	}
-	if _, err := tx.Exec(`DELETE FROM repositories WHERE id = ?`, id); err != nil {
+	if err := qtx.DeleteRepo(ctx, id); err != nil {
 		return err
 	}
 	return tx.Commit()
 }
 
-// Session CRUD
+// Session operations
 
 func (s *Store) UpsertSession(sess models.Session) error {
-	_, err := s.db.Exec(`
-		INSERT INTO sessions (
-			repo_path, checkpoint_id, session_id, agent, branch, created_at, prompt,
-			agent_lines, human_added, human_modified, human_removed,
-			total_committed, agent_percentage,
-			input_tokens, output_tokens, api_call_count
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT(session_id) DO UPDATE SET
-			repo_path=excluded.repo_path,
-			agent=excluded.agent, branch=excluded.branch,
-			created_at=excluded.created_at, prompt=excluded.prompt,
-			agent_lines=excluded.agent_lines, human_added=excluded.human_added,
-			human_modified=excluded.human_modified, human_removed=excluded.human_removed,
-			total_committed=excluded.total_committed, agent_percentage=excluded.agent_percentage,
-			input_tokens=excluded.input_tokens, output_tokens=excluded.output_tokens,
-			api_call_count=excluded.api_call_count
-	`,
-		sess.RepoPath, sess.CheckpointID, sess.SessionID, sess.Agent, sess.Branch, sess.CreatedAt, sess.Prompt,
-		sess.AgentLines, sess.HumanAdded, sess.HumanModified, sess.HumanRemoved,
-		sess.TotalCommitted, sess.AgentPercentage,
-		sess.InputTokens, sess.OutputTokens, sess.APICallCount,
-	)
-	return err
+	return s.queries.UpsertSession(context.Background(), sqlc.UpsertSessionParams{
+		RepoPath:        sess.RepoPath,
+		CheckpointID:    sess.CheckpointID,
+		SessionID:       sess.SessionID,
+		Agent:           sess.Agent,
+		Branch:          sess.Branch,
+		CreatedAt:       sess.CreatedAt,
+		Prompt:          sess.Prompt,
+		AgentLines:      int64(sess.AgentLines),
+		HumanAdded:      int64(sess.HumanAdded),
+		HumanModified:   int64(sess.HumanModified),
+		HumanRemoved:    int64(sess.HumanRemoved),
+		TotalCommitted:  int64(sess.TotalCommitted),
+		AgentPercentage: sess.AgentPercentage,
+		InputTokens:     int64(sess.InputTokens),
+		OutputTokens:    int64(sess.OutputTokens),
+		ApiCallCount:    int64(sess.APICallCount),
+	})
 }
 
-func (s *Store) GetDailyStats(repoPath string) ([]models.DailyStat, error) {
-	rows, err := s.db.Query(`
-		SELECT
-			substr(created_at, 1, 10) AS date,
-			SUM(agent_lines) AS agent_lines,
-			SUM(human_added) AS human_lines,
-			SUM(agent_lines) + SUM(human_added) AS total_lines,
-			CASE WHEN SUM(agent_lines) + SUM(human_added) > 0
-				THEN ROUND(CAST(SUM(agent_lines) AS REAL) / (SUM(agent_lines) + SUM(human_added)) * 100, 1)
-				ELSE 0
-			END AS agent_percentage,
-			COUNT(*) AS session_count
-		FROM sessions
-		WHERE (? = '' OR repo_path = ?)
-		GROUP BY substr(created_at, 1, 10)
-		ORDER BY date
-	`, repoPath, repoPath)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var stats []models.DailyStat
-	for rows.Next() {
-		var s models.DailyStat
-		if err := rows.Scan(&s.Date, &s.AgentLines, &s.HumanLines, &s.TotalLines, &s.AgentPercentage, &s.SessionCount); err != nil {
-			return nil, err
-		}
-		stats = append(stats, s)
-	}
-	return stats, rows.Err()
+func (s *Store) GetDailyStats(repoPath string) ([]sqlc.GetDailyStatsRow, error) {
+	return s.queries.GetDailyStats(context.Background(), sqlc.GetDailyStatsParams{
+		Column1:  repoPath,
+		RepoPath: repoPath,
+	})
 }
 
-func (s *Store) GetSessions(repoPath string) ([]models.Session, error) {
-	rows, err := s.db.Query(`
-		SELECT id, repo_path, checkpoint_id, session_id, agent, branch, created_at, prompt,
-			agent_lines, human_added, human_modified, human_removed,
-			total_committed, agent_percentage,
-			input_tokens, output_tokens, api_call_count
-		FROM sessions
-		WHERE (? = '' OR repo_path = ?)
-		ORDER BY created_at DESC
-	`, repoPath, repoPath)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var sessions []models.Session
-	for rows.Next() {
-		var s models.Session
-		if err := rows.Scan(
-			&s.ID, &s.RepoPath, &s.CheckpointID, &s.SessionID, &s.Agent, &s.Branch, &s.CreatedAt, &s.Prompt,
-			&s.AgentLines, &s.HumanAdded, &s.HumanModified, &s.HumanRemoved,
-			&s.TotalCommitted, &s.AgentPercentage,
-			&s.InputTokens, &s.OutputTokens, &s.APICallCount,
-		); err != nil {
-			return nil, err
-		}
-		sessions = append(sessions, s)
-	}
-	return sessions, rows.Err()
+func (s *Store) GetSessions(repoPath string) ([]sqlc.Session, error) {
+	return s.queries.GetSessions(context.Background(), sqlc.GetSessionsParams{
+		Column1:  repoPath,
+		RepoPath: repoPath,
+	})
 }
 
 func (s *Store) SessionExists(sessionID string) (bool, error) {
-	var count int
-	err := s.db.QueryRow("SELECT COUNT(*) FROM sessions WHERE session_id = ?", sessionID).Scan(&count)
+	count, err := s.queries.SessionExists(context.Background(), sessionID)
 	return count > 0, err
 }
 
