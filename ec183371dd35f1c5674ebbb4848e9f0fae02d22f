@@ -1,0 +1,23 @@
+backend/db/query.sql
+  b06a1617ef5cefa7 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "ec183371dd35f1c5674ebbb4848e9f0fae02d22f",
+  "prompts": {
+    "b06a1617ef5cefa7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ecf032e3-fc8f-41db-b7d3-19fb4ec8ca39",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 61,
+      "total_deletions": 0,
+      "accepted_lines": 61,
+      "overriden_lines": 0
+    }
+  }
+}
