@@ -1,0 +1,23 @@
+backend/db/db.go
+  b06a1617ef5cefa7 4,6-7,12-13,16-18,21,25,29-30,32-33,37,40-60,63,66,68-70,72-75,78-79,82-83,90-92,95,98,104,107-124,127-130,134-137,142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "126373c8b88d632bfd0d0047251464b0d23728c5",
+  "prompts": {
+    "b06a1617ef5cefa7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ecf032e3-fc8f-41db-b7d3-19fb4ec8ca39",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 90,
+      "total_deletions": 174,
+      "accepted_lines": 85,
+      "overriden_lines": 0
+    }
+  }
+}
