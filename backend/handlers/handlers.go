@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"entire-dashboard/db"
 	"entire-dashboard/generated"
 	gitreader "entire-dashboard/git"
@@ -27,7 +28,7 @@ func (h *Handler) GetRepos(ctx context.Context) (generated.GetReposRes, error) {
 	result := make(generated.GetReposOKApplicationJSON, 0, len(repos))
 	for _, r := range repos {
 		result = append(result, generated.Repository{
-			ID:        r.ID,
+			ID:        int(r.ID),
 			Path:      r.Path,
 			Name:      r.Name,
 			CreatedAt: r.CreatedAt,
@@ -52,7 +53,7 @@ func (h *Handler) AddRepo(ctx context.Context, req *generated.AddRepoRequest) (g
 		return &generated.AddRepoInternalServerError{Message: "failed to add repo: " + err.Error()}, nil
 	}
 	return &generated.Repository{
-		ID:        repo.ID,
+		ID:        int(repo.ID),
 		Path:      repo.Path,
 		Name:      repo.Name,
 		CreatedAt: repo.CreatedAt,
@@ -60,7 +61,7 @@ func (h *Handler) AddRepo(ctx context.Context, req *generated.AddRepoRequest) (g
 }
 
 func (h *Handler) DeleteRepo(ctx context.Context, params generated.DeleteRepoParams) (generated.DeleteRepoRes, error) {
-	if err := h.store.DeleteRepo(params.ID); err != nil {
+	if err := h.store.DeleteRepo(int64(params.ID)); err != nil {
 		return &generated.DeleteRepoInternalServerError{Message: "failed to delete repo: " + err.Error()}, nil
 	}
 	return &generated.DeleteRepoResponse{Status: "ok"}, nil
@@ -76,11 +77,11 @@ func (h *Handler) GetDailyStats(ctx context.Context, params generated.GetDailySt
 	for _, s := range stats {
 		result = append(result, generated.DailyStat{
 			Date:            s.Date,
-			AgentLines:      s.AgentLines,
-			HumanLines:      s.HumanLines,
-			TotalLines:      s.TotalLines,
-			AgentPercentage: s.AgentPercentage,
-			SessionCount:    s.SessionCount,
+			AgentLines:      int(nullFloat64ToInt64(s.AgentLines)),
+			HumanLines:      int(nullFloat64ToInt64(s.HumanLines)),
+			TotalLines:      int(s.TotalLines),
+			AgentPercentage: float64(s.AgentPercentage),
+			SessionCount:    int(s.SessionCount),
 		})
 	}
 	return &result, nil
@@ -95,7 +96,7 @@ func (h *Handler) GetSessions(ctx context.Context, params generated.GetSessionsP
 	result := make(generated.GetSessionsOKApplicationJSON, 0, len(sessions))
 	for _, s := range sessions {
 		result = append(result, generated.Session{
-			ID:              s.ID,
+			ID:              int(s.ID),
 			RepoPath:        s.RepoPath,
 			CheckpointID:    s.CheckpointID,
 			SessionID:       s.SessionID,
@@ -103,15 +104,15 @@ func (h *Handler) GetSessions(ctx context.Context, params generated.GetSessionsP
 			Branch:          s.Branch,
 			CreatedAt:       s.CreatedAt,
 			Prompt:          s.Prompt,
-			AgentLines:      s.AgentLines,
-			HumanAdded:      s.HumanAdded,
-			HumanModified:   s.HumanModified,
-			HumanRemoved:    s.HumanRemoved,
-			TotalCommitted:  s.TotalCommitted,
+			AgentLines:      int(s.AgentLines),
+			HumanAdded:      int(s.HumanAdded),
+			HumanModified:   int(s.HumanModified),
+			HumanRemoved:    int(s.HumanRemoved),
+			TotalCommitted:  int(s.TotalCommitted),
 			AgentPercentage: s.AgentPercentage,
-			InputTokens:     s.InputTokens,
-			OutputTokens:    s.OutputTokens,
-			APICallCount:    s.APICallCount,
+			InputTokens:     int(s.InputTokens),
+			OutputTokens:    int(s.OutputTokens),
+			APICallCount:    int(s.ApiCallCount),
 		})
 	}
 	return &result, nil
@@ -174,4 +175,12 @@ func (h *Handler) SyncData(ctx context.Context, params generated.SyncDataParams)
 		Inserted:   totalInserted,
 		Message:    "sync complete",
 	}, nil
+}
+
+// nullFloat64ToInt64 converts sql.NullFloat64 to int64, returning 0 if not valid.
+func nullFloat64ToInt64(n sql.NullFloat64) int64 {
+	if !n.Valid {
+		return 0
+	}
+	return int64(n.Float64)
 }
