@@ -20,6 +20,7 @@ export function SessionTimeline({ sessions }: Props) {
         <div className="session-row session-row--header">
           <div>Date</div>
           <div>Branch / Prompt</div>
+          <div style={{ textAlign: "center" }}>Status</div>
           <div style={{ textAlign: "right" }}>AI Lines</div>
           <div style={{ textAlign: "right" }}>Human Lines</div>
           <div style={{ textAlign: "right" }}>Total</div>
@@ -63,6 +64,11 @@ function SessionRow({ session: s }: { session: Session }) {
           {!expanded && s.prompt && (
             <div className="session-prompt">{s.prompt}</div>
           )}
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <span className={`merged-badge ${s.merged_to_main ? "merged-badge--merged" : "merged-badge--unmerged"}`}>
+            {s.merged_to_main ? "Merged" : "Unmerged"}
+          </span>
         </div>
         <div className="session-lines session-lines--ai">{s.agent_lines.toLocaleString()}</div>
         <div className="session-lines session-lines--human">{s.human_added.toLocaleString()}</div>

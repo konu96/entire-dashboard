@@ -27,6 +27,7 @@ type Session struct {
 	InputTokens     int     `json:"input_tokens"`
 	OutputTokens    int     `json:"output_tokens"`
 	APICallCount    int     `json:"api_call_count"`
+	MergedToMain    bool    `json:"merged_to_main"`
 }
 
 // DailyStat represents aggregated daily statistics.

@@ -132,6 +132,23 @@ func (r *Reader) gitShow(ref string) (string, error) {
 	return string(out), nil
 }
 
+// GetMergedBranches returns a set of branch names that have been merged into main.
+func GetMergedBranches(repoPath string) (map[string]bool, error) {
+	out, err := exec.Command("git", "-C", repoPath, "branch", "--merged", "main").Output()
+	if err != nil {
+		return nil, fmt.Errorf("git branch --merged main: %w", err)
+	}
+	merged := make(map[string]bool)
+	for _, line := range strings.Split(string(out), "\n") {
+		branch := strings.TrimSpace(line)
+		branch = strings.TrimPrefix(branch, "* ")
+		if branch != "" {
+			merged[branch] = true
+		}
+	}
+	return merged, nil
+}
+
 func truncate(s string, maxLen int) string {
 	runes := []rune(s)
 	if len(runes) <= maxLen {

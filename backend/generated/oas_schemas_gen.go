@@ -267,6 +267,7 @@ type Session struct {
 	InputTokens     int     `json:"input_tokens"`
 	OutputTokens    int     `json:"output_tokens"`
 	APICallCount    int     `json:"api_call_count"`
+	MergedToMain    bool    `json:"merged_to_main"`
 }
 
 // GetID returns the value of ID.
@@ -354,6 +355,11 @@ func (s *Session) GetAPICallCount() int {
 	return s.APICallCount
 }
 
+// GetMergedToMain returns the value of MergedToMain.
+func (s *Session) GetMergedToMain() bool {
+	return s.MergedToMain
+}
+
 // SetID sets the value of ID.
 func (s *Session) SetID(val int) {
 	s.ID = val
@@ -437,6 +443,11 @@ func (s *Session) SetOutputTokens(val int) {
 // SetAPICallCount sets the value of APICallCount.
 func (s *Session) SetAPICallCount(val int) {
 	s.APICallCount = val
+}
+
+// SetMergedToMain sets the value of MergedToMain.
+func (s *Session) SetMergedToMain(val bool) {
+	s.MergedToMain = val
 }
 
 // Ref: #/components/schemas/SyncResponse

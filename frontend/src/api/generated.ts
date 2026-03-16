@@ -47,6 +47,7 @@ export interface Session {
   input_tokens: number;
   output_tokens: number;
   api_call_count: number;
+  merged_to_main: boolean;
 }
 
 export interface SyncResponse {
