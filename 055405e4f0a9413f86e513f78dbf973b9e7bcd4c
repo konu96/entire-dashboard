@@ -1,0 +1,23 @@
+backend/handlers/handlers.go
+  b06a1617ef5cefa7 5,31,56,64,80-84,99,107-111,113-115,179-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "055405e4f0a9413f86e513f78dbf973b9e7bcd4c",
+  "prompts": {
+    "b06a1617ef5cefa7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ecf032e3-fc8f-41db-b7d3-19fb4ec8ca39",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 29,
+      "total_deletions": 20,
+      "accepted_lines": 26,
+      "overriden_lines": 0
+    }
+  }
+}
