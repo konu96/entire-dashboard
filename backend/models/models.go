@@ -1,13 +1,5 @@
 package models
 
-// Repository represents a registered git repository.
-type Repository struct {
-	ID        int    `json:"id"`
-	Path      string `json:"path"`
-	Name      string `json:"name"`
-	CreatedAt string `json:"created_at"`
-}
-
 // Session represents a single AI agent session extracted from Entire's shadow branch.
 type Session struct {
 	ID              int     `json:"id"`
@@ -27,16 +19,6 @@ type Session struct {
 	InputTokens     int     `json:"input_tokens"`
 	OutputTokens    int     `json:"output_tokens"`
 	APICallCount    int     `json:"api_call_count"`
-}
-
-// DailyStat represents aggregated daily statistics.
-type DailyStat struct {
-	Date            string  `json:"date"`
-	AgentLines      int     `json:"agent_lines"`
-	HumanLines      int     `json:"human_lines"`
-	TotalLines      int     `json:"total_lines"`
-	AgentPercentage float64 `json:"agent_percentage"`
-	SessionCount    int     `json:"session_count"`
 }
 
 // CheckpointMeta is the top-level metadata.json for a checkpoint.
