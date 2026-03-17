@@ -1006,9 +1006,13 @@ func (s *Session) encodeFields(e *jx.Encoder) {
 		e.FieldStart("api_call_count")
 		e.Int(s.APICallCount)
 	}
+	{
+		e.FieldStart("merged_to_main")
+		e.Bool(s.MergedToMain)
+	}
 }
 
-var jsonFieldsNameOfSession = [17]string{
+var jsonFieldsNameOfSession = [18]string{
 	0:  "id",
 	1:  "repo_path",
 	2:  "checkpoint_id",
@@ -1026,6 +1030,7 @@ var jsonFieldsNameOfSession = [17]string{
 	14: "input_tokens",
 	15: "output_tokens",
 	16: "api_call_count",
+	17: "merged_to_main",
 }
 
 // Decode decodes Session from json.
@@ -1241,6 +1246,18 @@ func (s *Session) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"api_call_count\"")
 			}
+		case "merged_to_main":
+			requiredBitSet[2] |= 1 << 1
+			if err := func() error {
+				v, err := d.Bool()
+				s.MergedToMain = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"merged_to_main\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -1253,7 +1270,7 @@ func (s *Session) Decode(d *jx.Decoder) error {
 	for i, mask := range [3]uint8{
 		0b11111111,
 		0b11111111,
-		0b00000001,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

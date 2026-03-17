@@ -130,6 +130,13 @@ function App() {
   const overallPct =
     totalAll > 0 ? ((totalAgent / totalAll) * 100).toFixed(1) : "0.0";
   const totalSessions = sessions.length;
+  const mergedAgentLines = sessions
+    .filter((s) => s.merged_to_main)
+    .reduce((sum, s) => sum + s.agent_lines, 0);
+  const mergedPct =
+    totalAgent > 0
+      ? ((mergedAgentLines / totalAgent) * 100).toFixed(1)
+      : "0.0";
 
   return (
     <div className="dashboard">
@@ -252,6 +259,13 @@ function App() {
         <div className="kpi-card">
           <div className="kpi-label">Sessions</div>
           <div className="kpi-value">{totalSessions}</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-label">Merged to Main</div>
+          <div className="kpi-value">
+            {mergedPct}
+            <span className="kpi-unit">%</span>
+          </div>
         </div>
       </div>
 

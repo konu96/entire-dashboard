@@ -55,7 +55,12 @@ func migrate(db *sql.DB) error {
 		CREATE INDEX IF NOT EXISTS idx_sessions_created_at ON sessions(created_at);
 		CREATE INDEX IF NOT EXISTS idx_sessions_repo_path ON sessions(repo_path);
 	`)
-	return err
+	if err != nil {
+		return err
+	}
+	// Add merged_to_main column (idempotent: ignore error if already exists)
+	_, _ = db.Exec(`ALTER TABLE sessions ADD COLUMN merged_to_main INTEGER NOT NULL DEFAULT 0`)
+	return nil
 }
 
 // Repository CRUD
@@ -132,13 +137,18 @@ func (s *Store) DeleteRepo(id int) error {
 // Session CRUD
 
 func (s *Store) UpsertSession(sess models.Session) error {
+	mergedInt := 0
+	if sess.MergedToMain {
+		mergedInt = 1
+	}
 	_, err := s.db.Exec(`
 		INSERT INTO sessions (
 			repo_path, checkpoint_id, session_id, agent, branch, created_at, prompt,
 			agent_lines, human_added, human_modified, human_removed,
 			total_committed, agent_percentage,
-			input_tokens, output_tokens, api_call_count
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			input_tokens, output_tokens, api_call_count,
+			merged_to_main
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(session_id) DO UPDATE SET
 			repo_path=excluded.repo_path,
 			agent=excluded.agent, branch=excluded.branch,
@@ -147,12 +157,14 @@ func (s *Store) UpsertSession(sess models.Session) error {
 			human_modified=excluded.human_modified, human_removed=excluded.human_removed,
 			total_committed=excluded.total_committed, agent_percentage=excluded.agent_percentage,
 			input_tokens=excluded.input_tokens, output_tokens=excluded.output_tokens,
-			api_call_count=excluded.api_call_count
+			api_call_count=excluded.api_call_count,
+			merged_to_main=excluded.merged_to_main
 	`,
 		sess.RepoPath, sess.CheckpointID, sess.SessionID, sess.Agent, sess.Branch, sess.CreatedAt, sess.Prompt,
 		sess.AgentLines, sess.HumanAdded, sess.HumanModified, sess.HumanRemoved,
 		sess.TotalCommitted, sess.AgentPercentage,
 		sess.InputTokens, sess.OutputTokens, sess.APICallCount,
+		mergedInt,
 	)
 	return err
 }
@@ -195,7 +207,8 @@ func (s *Store) GetSessions(repoPath string) ([]models.Session, error) {
 		SELECT id, repo_path, checkpoint_id, session_id, agent, branch, created_at, prompt,
 			agent_lines, human_added, human_modified, human_removed,
 			total_committed, agent_percentage,
-			input_tokens, output_tokens, api_call_count
+			input_tokens, output_tokens, api_call_count,
+			merged_to_main
 		FROM sessions
 		WHERE (? = '' OR repo_path = ?)
 		ORDER BY created_at DESC
@@ -208,17 +221,59 @@ func (s *Store) GetSessions(repoPath string) ([]models.Session, error) {
 	var sessions []models.Session
 	for rows.Next() {
 		var s models.Session
+		var mergedInt int
 		if err := rows.Scan(
 			&s.ID, &s.RepoPath, &s.CheckpointID, &s.SessionID, &s.Agent, &s.Branch, &s.CreatedAt, &s.Prompt,
 			&s.AgentLines, &s.HumanAdded, &s.HumanModified, &s.HumanRemoved,
 			&s.TotalCommitted, &s.AgentPercentage,
 			&s.InputTokens, &s.OutputTokens, &s.APICallCount,
+			&mergedInt,
 		); err != nil {
 			return nil, err
 		}
+		s.MergedToMain = mergedInt != 0
 		sessions = append(sessions, s)
 	}
 	return sessions, rows.Err()
+}
+
+func (s *Store) UpdateMergedStatus(repoPath string, mergedBranches map[string]bool) error {
+	rows, err := s.db.Query(
+		`SELECT id, branch FROM sessions WHERE repo_path = ?`, repoPath,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	type sessionBranch struct {
+		id     int
+		branch string
+	}
+	var items []sessionBranch
+	for rows.Next() {
+		var sb sessionBranch
+		if err := rows.Scan(&sb.id, &sb.branch); err != nil {
+			return err
+		}
+		items = append(items, sb)
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	for _, sb := range items {
+		merged := 0
+		if mergedBranches[sb.branch] {
+			merged = 1
+		}
+		if _, err := s.db.Exec(
+			`UPDATE sessions SET merged_to_main = ? WHERE id = ?`, merged, sb.id,
+		); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *Store) SessionExists(sessionID string) (bool, error) {

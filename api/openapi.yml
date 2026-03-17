@@ -201,6 +201,7 @@ components:
         - input_tokens
         - output_tokens
         - api_call_count
+        - merged_to_main
       properties:
         id:
           type: integer
@@ -237,6 +238,8 @@ components:
           type: integer
         api_call_count:
           type: integer
+        merged_to_main:
+          type: boolean
     SyncResponse:
       type: object
       required:

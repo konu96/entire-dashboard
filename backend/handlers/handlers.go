@@ -112,6 +112,7 @@ func (h *Handler) GetSessions(ctx context.Context, params generated.GetSessionsP
 			InputTokens:     s.InputTokens,
 			OutputTokens:    s.OutputTokens,
 			APICallCount:    s.APICallCount,
+			MergedToMain:    s.MergedToMain,
 		})
 	}
 	return &result, nil
@@ -167,6 +168,18 @@ func (h *Handler) SyncData(ctx context.Context, params generated.SyncDataParams)
 		}
 		totalFound += len(sessions)
 		totalInserted += inserted
+	}
+
+	// Update merged_to_main status for all synced repos
+	for _, rp := range repos {
+		mergedBranches, err := gitreader.GetMergedBranches(rp)
+		if err != nil {
+			log.Printf("get merged branches error for %s: %v", rp, err)
+			continue
+		}
+		if err := h.store.UpdateMergedStatus(rp, mergedBranches); err != nil {
+			log.Printf("update merged status error for %s: %v", rp, err)
+		}
 	}
 
 	return &generated.SyncResponse{
