@@ -1,0 +1,23 @@
+docs/superpowers/plans/2026-03-16-merged-to-main-stats.md
+  79376f402afeb3d1 1-552
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "c0155429cee39b9821c54405b9373df69636dc67",
+  "prompts": {
+    "79376f402afeb3d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e8d77b17-e6b6-4a31-b016-f4471f681300",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "konu96 <ukouhei96@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 552,
+      "overriden_lines": 0
+    }
+  }
+}
